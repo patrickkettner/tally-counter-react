@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link
+            rel="stylesheet"
+            href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+            integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+            crossorigin="anonymous"
+        />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,800&display=swap&subset=cyrillic-ext,latin-ext" rel="stylesheet">
+        <link rel="stylesheet" href="welcome.css" />
+    </head>
+    <body>
+        <section id="welcome">
+            <h1>
+                Thank you for installing <strong>Tally counter</strong>
+                <img src="images/icon48.png" id="icon" />
+            </h1>
+        </section>
+        <section id="hotkeys">
+            <h2>Keyboard shortcuts / Hotkeys</h2>
+
+            <h3>Default:</h3>
+<!-- <img class="option-key" src="images/option-key.png"> -->
+            <div class="hotkey">
+                Shortct/hotkey
+                <span id="windows">Windows</span>
+                <span id="macOS">macOS</span>
+            </div>
+            <div class="hotkey">
+                <strong class="name">Show/hide extension:</strong>
+                <span class="windows">alt + t</span>
+                <span class="mac">
+                    <i class="fas fa-chevron-up"></i> + t
+                </span>
+            </div>
+            <div class="hotkey">
+                <strong class="name">First item +1:</strong>
+                <span class="windows">alt + 1</span>
+                <span class="mac">
+                        <i class="fas fa-chevron-up"></i> + 1
+                    </span>
+            </div>
+            <div class="hotkey">
+                <strong class="name">First item -1:</strong>
+                <span class="windows">alt + shift + 1</span>
+                <span class="mac">
+                        <i class="fas fa-chevron-up"></i> + ⇧ + 1
+                    </span>
+            </div>
+            
+
+            <p>The hotkeys work even when the extension is closed, <span class="danger">I don't recommend muting your notifications</span>, you won't be able to see any visual confirmation.</p><br>
+
+            To set more hotkeys go to
+            <a href="chrome://extensions/shortcuts"
+                >chrome://extensions/shortcuts</a
+            >
+            (you need to copy it into the address bar).
+        </section>
+        <section id="export">
+            <h2>Export</h2>
+            You can export your data to .csv via the export button:
+            <div id="export"><img src="images/export.png" /></div>
+        </section>
+    </body>
+</html>
