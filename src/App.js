@@ -24,10 +24,19 @@ class App extends Component {
     //     console.log(this.state.items);
     // }
 
+    getState = () => {
+        const updatedState = {
+            ...this.state,
+            items: JSON.parse(JSON.stringify(this.state.items))
+        }
+        return updatedState;
+    }
+
     addItemHandler = () => {
-        const updatedArray = [...this.state.items];
-        updatedArray.push({ itemName: '', number: 0 })
-        this.setState({ items: updatedArray })
+        const updatedState = this.getState();
+        updatedState.items.push({ itemName: '', number: 0 });
+
+        this.setState(updatedState);
     }
 
     resetAllHandler = () => {
@@ -36,48 +45,36 @@ class App extends Component {
             return item;
         });
         this.setState({ items: updatedArray });
-
     }
 
     onChangeHandler = (e, index, type) => {
-        let updatedArray = [...this.state.items];
-        let updatedItem = { ...updatedArray[index] };
-        updatedItem[type] = type === 'number' ? +e.target.value : e.target.value;
-        updatedArray[index] = updatedItem;
-        this.setState({ items: updatedArray })
+        const updatedState = this.getState();
+        updatedState.items[index][type] = type === 'number' ? +e.target.value : e.target.value;
+        this.setState(updatedState);
     }
 
     deleteHandler = (id) => {
         // what is better?
         // const updatedArray = [...this.state.items];
-        // updatedArray.splice(index, 1);
-        const updatedArray = this.state.items.filter((item, index) => index !== id)
+        // updatedArray.splice(index, 1); - filter is better, because splice mutates the orginal array
+        const updatedArray = this.state.items.filter((_, index) => index !== id)
         this.setState({ items: updatedArray })
     }
 
     incrementHandler = (index) => {
-        const updatedState = {
-            ...this.state,
-            items: JSON.parse(JSON.stringify(this.state.items))
-        }
+        const updatedState = this.getState();
         updatedState.items[index].number++;
         this.setState(updatedState);
     }
 
     decrementHandler = (index) => {
-        const updatedState = {
-            ...this.state,
-            items: JSON.parse(JSON.stringify(this.state.items))
-        }
+        const updatedState = this.getState();
         updatedState.items[index].number--;
         this.setState(updatedState);
     }
 
     resetHandler = (index) => {
-        const updatedState = {
-            ...this.state,
-            items: JSON.parse(JSON.stringify(this.state.items))
-        }
+        const updatedState = this.getState();
         updatedState.items[index].number = 0;
         this.setState(updatedState);
     }
@@ -134,7 +131,6 @@ class App extends Component {
                             reset={() => this.resetHandler(index)} />
                     ))
                 }
-
             </div >
         );
     }

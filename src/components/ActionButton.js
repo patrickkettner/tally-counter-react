@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import React from 'react';
+
 
 const changeButtonBackground = props => {
     switch (props.type) {
@@ -19,15 +21,15 @@ const changeButtonBackground = props => {
     }
 };
 
-// const Button = ({ className, ...props }) => {
-//     return (
-//         <button className={className} onClick={props.delete}>
-//             <i className={props.type === 'delete' ? 'fas fa-times' : 'fas fa-' + props.type} />
-//         </button>
-//     );
-// };
+const Button = ({className, ...props}) => {
+    return (
+        <button className={className} onClick={props.delete}>
+            <i className={props.type === 'delete' ? 'fas fa-times' : `fas fa-${props.type}`} />
+        </button>
+    );
+};
 
-const ActionButton = styled.button`
+const ActionButton = styled(Button)`
     width: 1.5rem;
     height: 1.5rem;
     padding: 0 0.5rem;

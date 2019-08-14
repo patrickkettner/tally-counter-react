@@ -6,7 +6,7 @@ import Input from './Input';
 const baseItem = ({ className, ...props }) => {
     return (
         <div className={className}>
-            <ActionButton className="fas fa-times" type="delete" onClick={props.delete} />
+            <ActionButton type="delete" onClick={props.delete} />
             <Input itemName
                 value={props.itemName}
                 onChange={props.itemNameChange} />
@@ -14,10 +14,9 @@ const baseItem = ({ className, ...props }) => {
             <Input number
                 value={props.numberValue}
                 onChange={props.numberChange} />
-            <ActionButton className="fas fa-plus" type="plus" onClick={props.increment} />
-            <ActionButton className="fas fa-minus" type="minus" onClick={props.decrement} />
-            <ActionButton className="fas fa-undo" type="undo" onClick={props.reset} />
-
+            <ActionButton type="plus" onClick={props.increment} />
+            <ActionButton type="minus" onClick={props.decrement} />
+            <ActionButton type="undo" onClick={props.reset} />
         </div>
     );
 };
