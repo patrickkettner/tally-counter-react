@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 
-//if more than two types - make a switch statement
 const stylesBasedOnInputType = props => {
     let styles = props.itemName
         ? `
@@ -30,7 +29,7 @@ const Input = styled.input`
 Input.propTypes = {
     itemName: PropTypes.bool,
     number: PropTypes.bool,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-}
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
 
 export default Input;

@@ -31,12 +31,12 @@ const Item = styled(baseItem)`
 Item.propTypes = {
     numberValue: PropTypes.number.isRequired,
     itemName: PropTypes.string.isRequired,
-    itemNameChange: PropTypes.func,
-    numberChange: PropTypes.func,
+    itemNameChange: PropTypes.func.isRequired,
+    numberChange: PropTypes.func.isRequired,
     delete: PropTypes.func.isRequired,
     increment: PropTypes.func.isRequired,
     decrement: PropTypes.func.isRequired,
     reset: PropTypes.func.isRequired,
-}
+};
 
 export default Item;

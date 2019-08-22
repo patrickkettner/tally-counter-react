@@ -12,18 +12,15 @@ class App extends Component {
             {
                 itemName: 'whatever',
                 number: 2,
+                id: 1,
             },
             {
                 itemName: 'něco',
                 number: -1,
+                id: 2,
             },
         ],
     };
-
-    // componentDidUpdate(prevProps, prevState) {
-    //     console.log(prevState.items);
-    //     console.log(this.state.items);
-    // }
 
     getState = () => {
         const updatedState = {
@@ -55,9 +52,6 @@ class App extends Component {
     };
 
     deleteHandler = id => {
-        // what is better?
-        // const updatedArray = [...this.state.items];
-        // updatedArray.splice(index, 1); - filter is better, because splice mutates the orginal array
         const updatedArray = this.state.items.filter((_, index) => index !== id);
         this.setState({ items: updatedArray });
     };
@@ -85,13 +79,12 @@ class App extends Component {
         let arrOfValues = this.state.items.map(a => a.itemName + ',' + a.number);
         arrOfValues.unshift('Item name,Number');
         let csv = arrOfValues.join('\n');
-    
+
         var data = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' });
-    
+
         var url = window.URL.createObjectURL(data);
         document.getElementById('export').href = url;
     };
-
 
     render() {
         const Header = styled.h1`
@@ -103,16 +96,6 @@ class App extends Component {
         return (
             <div className="App">
                 <Header>Tally Counter</Header>
-                {/* <img
-                    src="images/icon48.png"
-                    id="icon"
-                    alt="logo"
-                    style={{
-                        width: 18,
-                        display: 'inline',
-                        marginLeft: '0.3rem',
-                    }}
-                /> */}
                 <Logo />
                 <br />
                 settings
@@ -121,9 +104,9 @@ class App extends Component {
                     <Button float="left" onClick={this.addItemHandler}>
                         Add item
                     </Button>
-                    
-                    <a id="export" download="tally-counter.csv">
-                    <ImageButton className="fas fa-file-download" onClick={this.exportHandler} />
+
+                    <a id="export" href="index.html" download="tally-counter.csv">
+                        <ImageButton className="fas fa-file-download" onClick={this.exportHandler} />
                     </a>
 
                     <Button type="danger" float="right" onClick={this.resetAllHandler}>
@@ -134,7 +117,7 @@ class App extends Component {
                     <Item
                         numberValue={item.number}
                         itemName={item.itemName}
-                        key={index} //is this alright? I heard you shouldn't use index as a key
+                        key={index} //is this alright? I heard you shouldn't use index as a key - yeah it's wrong David!!
                         itemNameChange={e => this.onChangeHandler(e, index, 'itemName')}
                         numberChange={e => this.onChangeHandler(e, index, 'number')}
                         delete={() => this.deleteHandler(index)}
