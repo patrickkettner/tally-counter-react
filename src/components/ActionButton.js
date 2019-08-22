@@ -1,5 +1,7 @@
-import styled from 'styled-components';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import styled from 'styled-components';
 
 
 const changeButtonBackground = props => {
@@ -23,7 +25,7 @@ const changeButtonBackground = props => {
 
 const Button = ({className, ...props}) => {
     return (
-        <button className={className} onClick={props.delete}>
+        <button className={className}>
             <i className={props.type === 'delete' ? 'fas fa-times' : `fas fa-${props.type}`} />
         </button>
     );
@@ -49,5 +51,10 @@ const ActionButton = styled(Button)`
         ${props => (props.type === 'undo' ? 'transform: rotate(-180deg) scale(1.2)' : 'transform: scale(1.2)')};
     }
 `;
+
+
+ActionButton.propTypes = {
+    type: PropTypes.string.isRequired
+}
 
 export default ActionButton;
