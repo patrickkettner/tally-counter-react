@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
+import { getData, storageSync } from './storage';
 
 import Container from './components/Container';
 import Item from './components/Item';
@@ -10,20 +11,46 @@ import { light, dark } from './theme';
 
 class App extends Component {
     state = {
+        notifications: true,
         dark: false,
         items: [
             {
                 itemName: 'whatever',
                 number: 2,
-                id: 1,
             },
             {
                 itemName: 'něco',
                 number: -1,
-                id: 2,
             },
         ],
     };
+
+    // data = async () => {
+    //     const items = await getData;
+    //     await this.setState({ ...this.state, items: items });
+    // };
+
+    componentDidMount() {
+        getData().then(items => {
+            this.setState({ ...this.state, items: items });
+        });
+        if (localStorage.getItem('theme')) {
+            const theme = localStorage.getItem('theme') === 'true' ? true : false;
+            this.setState(prevState => ({
+                dark: theme,
+            }));
+        }
+    }
+
+    // componentDidUpdate(prevProps, prevState) {
+    //     if (prevState.items != this.state.items) {
+    //         storageSync(this.state.items);
+    //     }
+    // }
+
+    componentDidUpdate(prevProps, prevState) {
+        storageSync(this.state.items);
+    }
 
     getState = () => {
         const updatedState = {
@@ -34,7 +61,17 @@ class App extends Component {
         return updatedState;
     };
 
+    toggleNotificationsHandler = () => {
+        const notifications = !this.state.notifications;
+        localStorage.setItem('notifications', notifications);
+        this.setState(prevState => ({
+            notifications: !prevState.notifications,
+        }));
+    };
+
     toggleThemeHandler = () => {
+        const theme = !this.state.dark;
+        localStorage.setItem('theme', theme);
         this.setState(prevState => ({
             dark: !prevState.dark,
         }));
@@ -79,7 +116,6 @@ class App extends Component {
     };
 
     resetHandler = index => {
-        console.log('triggered');
         const updatedState = this.getState();
         updatedState.items[index].number = 0;
         this.setState(updatedState);
@@ -102,16 +138,20 @@ class App extends Component {
             font-size: 1.3rem;
             font-weight: lighter;
         `;
-
         return (
             <ThemeProvider theme={this.state.dark ? dark : light}>
                 <Container>
-                    <Header style={{ marginLeft: '1.4rem' }}>Tally Counter </Header>
+                    <ImageButton left small className="fas fa-bell" onClick={this.toggleNotificationsHandler} />
+                    <Header>Tally Counter</Header>
                     <Logo />
-                    <ImageButton right className="fas fa-cog" onClick={this.toggleThemeHandler} />
-                    <br />
-                    <br />
-                    <div>
+                    <ImageButton
+                        small
+                        right
+                        className={this.state.dark ? 'fa fa-lightbulb' : 'fas fa-moon'}
+                        style={{ width: '22.4px' }}
+                        onClick={this.toggleThemeHandler}
+                    />
+                    <div style={{ margin: '1rem 0' }}>
                         <TextButton float="left" onClick={this.addItemHandler}>
                             Add item
                         </TextButton>
