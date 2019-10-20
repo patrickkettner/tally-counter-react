@@ -23,6 +23,8 @@ const Input = styled.input`
     vertical-align: middle;
     height: 1.5rem;
     font-weight: bold;
+    background: ${props => props.theme.inputBackground};
+    border: none;
     ${stylesBasedOnInputType};
 `;
 

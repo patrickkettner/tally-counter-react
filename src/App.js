@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 
+import Container from './components/Container';
 import Item from './components/Item';
 import Logo from './components/Logo';
-import Button from './components/Button';
+import TextButton from './components/TextButton';
 import ImageButton from './components/ImageButton';
+import { light, dark } from './theme';
 
 class App extends Component {
     state = {
+        dark: false,
         items: [
             {
                 itemName: 'whatever',
@@ -25,9 +28,16 @@ class App extends Component {
     getState = () => {
         const updatedState = {
             ...this.state,
-            items: JSON.parse(JSON.stringify(this.state.items)),
+            ...this.state.items,
+            // items: JSON.parse(JSON.stringify(this.state.items)),
         };
         return updatedState;
+    };
+
+    toggleThemeHandler = () => {
+        this.setState(prevState => ({
+            dark: !prevState.dark,
+        }));
     };
 
     addItemHandler = () => {
@@ -94,39 +104,41 @@ class App extends Component {
         `;
 
         return (
-            <div className="App">
-                <Header>Tally Counter</Header>
-                <Logo />
-                <br />
-                settings
-                <br />
-                <div>
-                    <Button float="left" onClick={this.addItemHandler}>
-                        Add item
-                    </Button>
+            <ThemeProvider theme={this.state.dark ? dark : light}>
+                <Container>
+                    <Header style={{ marginLeft: '1.4rem' }}>Tally Counter </Header>
+                    <Logo />
+                    <ImageButton right className="fas fa-cog" onClick={this.toggleThemeHandler} />
+                    <br />
+                    <br />
+                    <div>
+                        <TextButton float="left" onClick={this.addItemHandler}>
+                            Add item
+                        </TextButton>
 
-                    <a id="export" href="index.html" download="tally-counter.csv">
-                        <ImageButton className="fas fa-file-download" onClick={this.exportHandler} />
-                    </a>
+                        <a id="export" href="index.html" download="tally-counter.csv">
+                            <ImageButton className="fas fa-file-download" onClick={this.exportHandler} />
+                        </a>
 
-                    <Button type="danger" float="right" onClick={this.resetAllHandler}>
-                        Reset all
-                    </Button>
-                </div>
-                {this.state.items.map((item, index) => (
-                    <Item
-                        numberValue={item.number}
-                        itemName={item.itemName}
-                        key={index} //is this alright? I heard you shouldn't use index as a key - yeah it's wrong David!!
-                        itemNameChange={e => this.onChangeHandler(e, index, 'itemName')}
-                        numberChange={e => this.onChangeHandler(e, index, 'number')}
-                        delete={() => this.deleteHandler(index)}
-                        increment={() => this.incrementHandler(index)}
-                        decrement={() => this.decrementHandler(index)}
-                        reset={() => this.resetHandler(index)}
-                    />
-                ))}
-            </div>
+                        <TextButton type="danger" float="right" onClick={this.resetAllHandler}>
+                            Reset all
+                        </TextButton>
+                    </div>
+                    {this.state.items.map((item, index) => (
+                        <Item
+                            numberValue={item.number}
+                            itemName={item.itemName}
+                            key={index} //is this alright? I heard you shouldn't use index as a key - yeah it's wrong David!!
+                            itemNameChange={e => this.onChangeHandler(e, index, 'itemName')}
+                            numberChange={e => this.onChangeHandler(e, index, 'number')}
+                            delete={() => this.deleteHandler(index)}
+                            increment={() => this.incrementHandler(index)}
+                            decrement={() => this.decrementHandler(index)}
+                            reset={() => this.resetHandler(index)}
+                        />
+                    ))}
+                </Container>
+            </ThemeProvider>
         );
     }
 }
