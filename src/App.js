@@ -42,21 +42,18 @@ class App extends Component {
         }
     }
 
-    // componentDidUpdate(prevProps, prevState) {
-    //     if (prevState.items != this.state.items) {
-    //         storageSync(this.state.items);
-    //     }
-    // }
-
     componentDidUpdate(prevProps, prevState) {
-        storageSync(this.state.items);
+        if (prevState.items != this.state.items) {
+            console.log(prevState.items);
+            console.log(this.state.items);
+            storageSync(this.state.items);
+        }
     }
 
     getState = () => {
         const updatedState = {
             ...this.state,
-            ...this.state.items,
-            // items: JSON.parse(JSON.stringify(this.state.items)),
+            items: JSON.parse(JSON.stringify(this.state.items)),
         };
         return updatedState;
     };
