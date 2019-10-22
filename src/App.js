@@ -43,9 +43,7 @@ class App extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.items != this.state.items) {
-            console.log(prevState.items);
-            console.log(this.state.items);
+        if (prevState.items !== this.state.items) {
             storageSync(this.state.items);
         }
     }
@@ -53,7 +51,7 @@ class App extends Component {
     getState = () => {
         const updatedState = {
             ...this.state,
-            items: JSON.parse(JSON.stringify(this.state.items)),
+            items: [...this.state.items],
         };
         return updatedState;
     };
@@ -102,6 +100,7 @@ class App extends Component {
 
     incrementHandler = index => {
         const updatedState = this.getState();
+        console.log(updatedState);
         updatedState.items[index].number++;
         this.setState(updatedState);
     };
