@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
+import uuid from 'uuid/v4';
 import { getData, storageSync } from './storage';
 
 import Container from './components/Container';
@@ -15,12 +16,14 @@ class App extends Component {
         dark: false,
         items: [
             {
-                itemName: 'whatever',
-                number: 2,
+                itemName: '',
+                number: 0,
+                id: '0a73d808-3452-414b-ae45-a040a9be244c',
             },
             {
-                itemName: 'něco',
-                number: -1,
+                itemName: 'error',
+                number: 999,
+                id: '2060229c-dd26-4f6b-a253-f8e2e9f029f0',
             },
         ],
     };
@@ -46,6 +49,9 @@ class App extends Component {
         if (prevState.items !== this.state.items) {
             storageSync(this.state.items);
         }
+        console.log(this.state.notifications);
+        // console.log(this.state.dark);
+        console.log(this.state.items);
     }
 
     getState = () => {
@@ -74,7 +80,7 @@ class App extends Component {
 
     addItemHandler = () => {
         const updatedState = this.getState();
-        updatedState.items.push({ itemName: '', number: 0 });
+        updatedState.items.push({ itemName: '', number: 0, id: uuid() });
 
         this.setState(updatedState);
     };
@@ -101,6 +107,9 @@ class App extends Component {
     incrementHandler = index => {
         const updatedState = this.getState();
         console.log(updatedState);
+        const id = uuid();
+        const id2 = uuid();
+        console.log(id, id2);
         updatedState.items[index].number++;
         this.setState(updatedState);
     };
@@ -137,7 +146,13 @@ class App extends Component {
         return (
             <ThemeProvider theme={this.state.dark ? dark : light}>
                 <Container>
-                    <ImageButton left small className="fas fa-bell" onClick={this.toggleNotificationsHandler} />
+                    <ImageButton
+                        left
+                        small
+                        className={this.state.notifications ? 'fas fa-bell-slash' : 'fas fa-bell'}
+                        style={{ width: '20px' }}
+                        onClick={this.toggleNotificationsHandler}
+                    />
                     <Header>Tally Counter</Header>
                     <Logo />
                     <ImageButton
@@ -164,7 +179,7 @@ class App extends Component {
                         <Item
                             numberValue={item.number}
                             itemName={item.itemName}
-                            key={index} //is this alright? I heard you shouldn't use index as a key - yeah it's wrong David!!
+                            key={item.id} //is this alright? I heard you shouldn't use index as a key - yeah it's wrong David!!
                             itemNameChange={e => this.onChangeHandler(e, index, 'itemName')}
                             numberChange={e => this.onChangeHandler(e, index, 'number')}
                             delete={() => this.deleteHandler(index)}

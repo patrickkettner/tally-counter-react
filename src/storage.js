@@ -1,3 +1,5 @@
+import uuid from 'uuid/v4';
+
 /* global chrome */
 export const getData = () => {
     return new Promise((resolve, reject) => {
@@ -6,9 +8,9 @@ export const getData = () => {
                 console.error(chrome.runtime.lastError.message);
                 reject(chrome.runtime.lastError.message);
             } else {
-                let res = result.items ? result.items : [{ itemName: '', number: 0 }];
+                let res = result.items ? result.items : [{ itemName: '', number: 0, id: uuid() }];
 
-                res = res.length ? res : [{ itemName: '', number: 0 }];
+                res = res.length ? res : [{ itemName: '', number: 0, id: uuid() }];
 
                 storageSync(res);
                 resolve(res);

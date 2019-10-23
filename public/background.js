@@ -30,12 +30,14 @@ const init = async () => {
             item.number = parseInt(item.number);
         }
     });
-    storageSync(items);
+    console.log('Ive got the data man!');
+    // storageSync(items);
 };
 
 init();
 
 const notification = (itemName, number, index) => {
+    console.log(itemName, number, index);
     const name = !itemName ? `(item #${index + 1})` : itemName;
     const options = {
         type: 'basic',
@@ -74,7 +76,11 @@ chrome.commands.onCommand.addListener(function(command) {
                             items[index].number -= 1;
                         }
                         storageSync(items);
-                        notification(items[index].itemName, items[index].number, index);
+                        const notificationSettings = JSON.parse(localStorage.getItem('notifications'));
+                        if (notificationSettings) {
+                            console.log(notificationSettings);
+                            notification(items[index].itemName, items[index].number, index);
+                        }
                     } catch (error) {
                         if (error.message == "Cannot read property 'number' of undefined") {
                             errNotification(index);
