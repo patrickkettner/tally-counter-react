@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import uuid from 'uuid/v4';
 import { getData, storageSync } from './storage';
+import { increaseCommands, decreaseCommands } from './commands.js';
 
 import Container from './components/Container';
 import Item from './components/Item';
@@ -9,11 +10,12 @@ import Logo from './components/Logo';
 import TextButton from './components/TextButton';
 import ImageButton from './components/ImageButton';
 import { light, dark } from './theme';
+/* global chrome */
 
 class App extends Component {
     state = {
         notifications: true,
-        dark: false,
+        dark: true,
         items: [
             {
                 itemName: '',
@@ -33,24 +35,10 @@ class App extends Component {
     //     await this.setState({ ...this.state, items: items });
     // };
 
-    componentDidMount() {
-        getData().then(items => {
-            this.setState({ ...this.state, items: items });
-        });
-        if (localStorage.getItem('theme')) {
-            const theme = localStorage.getItem('theme') === 'true' ? true : false;
-            this.setState(prevState => ({
-                dark: theme,
-            }));
-        }
-    }
-
     componentDidUpdate(prevProps, prevState) {
         if (prevState.items !== this.state.items) {
             storageSync(this.state.items);
         }
-        console.log(this.state.notifications);
-        // console.log(this.state.dark);
         console.log(this.state.items);
     }
 
@@ -86,11 +74,16 @@ class App extends Component {
     };
 
     resetAllHandler = () => {
-        const updatedArray = this.state.items.map(item => {
-            item.number = 0;
-            return item;
-        });
-        this.setState({ items: updatedArray });
+        const conf = window.confirm('Are you sure? All values will be reset to 0.');
+        if (!conf) {
+            return;
+        } else {
+            const updatedArray = this.state.items.map(item => {
+                item.number = 0;
+                return item;
+            });
+            this.setState({ items: updatedArray });
+        }
     };
 
     onChangeHandler = (e, index, type) => {
@@ -107,9 +100,6 @@ class App extends Component {
     incrementHandler = index => {
         const updatedState = this.getState();
         console.log(updatedState);
-        const id = uuid();
-        const id2 = uuid();
-        console.log(id, id2);
         updatedState.items[index].number++;
         this.setState(updatedState);
     };
@@ -136,6 +126,53 @@ class App extends Component {
         var url = window.URL.createObjectURL(data);
         document.getElementById('export').href = url;
     };
+
+    componentDidMount() {
+        chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+            if (increaseCommands.includes(message)) {
+                const index = message.substr(0, 1);
+                // form.children[index].children[3].click();
+                sendResponse('increased');
+                console.log(' INC message, index:', index);
+                const updatedState = {
+                    ...this.state,
+                    items: [...this.state.items],
+                };
+                console.log(updatedState);
+                updatedState.items[index].number++;
+                this.setState(updatedState);
+                // this.incrementHandler(index);
+            }
+
+            if (decreaseCommands.includes(message)) {
+                const index = message.substr(0, 1);
+                // form.children[index].children[4].click();
+                sendResponse('decreased');
+                console.log(' DEC message, index:', index);
+                this.decrementHandler(index);
+            }
+        });
+
+        if (localStorage.getItem('notifications')) {
+            const notifications = localStorage.getItem('notifications') === 'true' ? true : false;
+            this.setState({
+                ...this.state,
+                notifications,
+            });
+        }
+
+        if (localStorage.getItem('theme')) {
+            const theme = localStorage.getItem('theme') === 'true' ? true : false;
+            this.setState(prevState => ({
+                ...prevState.state,
+                dark: theme,
+            }));
+        }
+
+        getData().then(items => {
+            this.setState({ ...this.state, items: items });
+        });
+    }
 
     render() {
         const Header = styled.h1`
@@ -179,7 +216,7 @@ class App extends Component {
                         <Item
                             numberValue={item.number}
                             itemName={item.itemName}
-                            key={item.id} //is this alright? I heard you shouldn't use index as a key - yeah it's wrong David!!
+                            key={item.id}
                             itemNameChange={e => this.onChangeHandler(e, index, 'itemName')}
                             numberChange={e => this.onChangeHandler(e, index, 'number')}
                             delete={() => this.deleteHandler(index)}
