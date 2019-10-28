@@ -2,6 +2,7 @@ import uuid from 'uuid/v4';
 
 /* global chrome */
 export const getData = () => {
+    console.log('HTTP request getting data!');
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get(['items'], function(result) {
             if (chrome.runtime.lastError) {
@@ -18,8 +19,6 @@ export const getData = () => {
         });
     });
 };
-
-// export const data = async () => await getData();
 
 //syncs items array with chrome.storage
 export const storageSync = items =>

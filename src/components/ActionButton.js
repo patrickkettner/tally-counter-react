@@ -45,9 +45,9 @@ const ActionButton = styled(Button)`
     align-items: center;
     outline: none;
     border: none;
+    transition: transform 0.2s;
     cursor: pointer;
     background: ${changeButtonBackground};
-    transition: transform 0.3s;
     &:hover {
         ${props => (props.type === 'undo' ? 'transform: rotate(-180deg) scale(1.2)' : 'transform: scale(1.2)')};
     }

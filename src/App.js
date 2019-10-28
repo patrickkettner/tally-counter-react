@@ -22,24 +22,56 @@ class App extends Component {
                 number: 0,
                 id: '0a73d808-3452-414b-ae45-a040a9be244c',
             },
-            {
-                itemName: 'error',
-                number: 999,
-                id: '2060229c-dd26-4f6b-a253-f8e2e9f029f0',
-            },
         ],
     };
 
-    // data = async () => {
-    //     const items = await getData;
-    //     await this.setState({ ...this.state, items: items });
-    // };
+    componentDidMount() {
+        getData().then(items => {
+            this.setState({ ...this.state, items: items });
+        });
+
+        // if (!localStorage.getItem('notifications')) {
+        //     localStorage.setItem('notifications', true);
+        //     console.log('App.js notifications are set to true');
+        // }
+
+        if (localStorage.getItem('notifications')) {
+            const notifications = localStorage.getItem('notifications') === 'true' ? true : false;
+            //Q
+            this.setState({
+                ...this.state,
+                notifications,
+            });
+        }
+
+        if (localStorage.getItem('theme')) {
+            const theme = localStorage.getItem('theme') === 'true' ? true : false;
+            //Q
+            this.setState(prevState => ({
+                ...prevState.state,
+                dark: theme,
+            }));
+        }
+        //should I remove this listene - CWU?
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (increaseCommands.includes(message)) {
+                const index = message.substr(0, 1);
+                sendResponse('increased');
+                this.incrementHandler(index);
+            }
+
+            if (decreaseCommands.includes(message)) {
+                const index = message.substr(0, 1);
+                sendResponse('decreased');
+                this.decrementHandler(index);
+            }
+        });
+    }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.items !== this.state.items) {
             storageSync(this.state.items);
         }
-        console.log(this.state.items);
     }
 
     getState = () => {
@@ -99,7 +131,6 @@ class App extends Component {
 
     incrementHandler = index => {
         const updatedState = this.getState();
-        console.log(updatedState);
         updatedState.items[index].number++;
         this.setState(updatedState);
     };
@@ -119,66 +150,18 @@ class App extends Component {
     exportHandler = () => {
         let arrOfValues = this.state.items.map(a => a.itemName + ',' + a.number);
         arrOfValues.unshift('Item name,Number');
-        let csv = arrOfValues.join('\n');
-
-        var data = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' });
-
-        var url = window.URL.createObjectURL(data);
+        const csv = arrOfValues.join('\n');
+        const data = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' });
+        const url = window.URL.createObjectURL(data);
         document.getElementById('export').href = url;
     };
-
-    componentDidMount() {
-        chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-            if (increaseCommands.includes(message)) {
-                const index = message.substr(0, 1);
-                // form.children[index].children[3].click();
-                sendResponse('increased');
-                console.log(' INC message, index:', index);
-                const updatedState = {
-                    ...this.state,
-                    items: [...this.state.items],
-                };
-                console.log(updatedState);
-                updatedState.items[index].number++;
-                this.setState(updatedState);
-                // this.incrementHandler(index);
-            }
-
-            if (decreaseCommands.includes(message)) {
-                const index = message.substr(0, 1);
-                // form.children[index].children[4].click();
-                sendResponse('decreased');
-                console.log(' DEC message, index:', index);
-                this.decrementHandler(index);
-            }
-        });
-
-        if (localStorage.getItem('notifications')) {
-            const notifications = localStorage.getItem('notifications') === 'true' ? true : false;
-            this.setState({
-                ...this.state,
-                notifications,
-            });
-        }
-
-        if (localStorage.getItem('theme')) {
-            const theme = localStorage.getItem('theme') === 'true' ? true : false;
-            this.setState(prevState => ({
-                ...prevState.state,
-                dark: theme,
-            }));
-        }
-
-        getData().then(items => {
-            this.setState({ ...this.state, items: items });
-        });
-    }
 
     render() {
         const Header = styled.h1`
             display: inline;
             font-size: 1.3rem;
             font-weight: lighter;
+            transition: color 0.1s;
         `;
         return (
             <ThemeProvider theme={this.state.dark ? dark : light}>

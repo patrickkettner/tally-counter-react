@@ -7,7 +7,7 @@ const stylesBasedOnInputType = props => {
         ? `
     margin: 0 0.5rem;
     width: 120px;
-    padding-left: 0.5rem;
+    padding: 0 0 0 0.5rem;
     font-size: 0.75rem;`
         : `
     min-width: 3ch;
@@ -21,7 +21,7 @@ const stylesBasedOnInputType = props => {
 
 const Input = styled.input`
     vertical-align: middle;
-    height: 1.5rem;
+    height: 1.4rem;
     font-weight: bold;
     background: ${props => props.theme.inputBackground};
     border: none;
