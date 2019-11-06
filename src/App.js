@@ -1,28 +1,23 @@
 import React, { Component } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import uuid from 'uuid/v4';
+import debounce from 'lodash.debounce';
 import { getData, storageSync } from './storage';
 import { increaseCommands, decreaseCommands } from './commands.js';
 
+import { light, dark } from './theme';
 import Container from './components/Container';
 import Item from './components/Item';
 import Logo from './components/Logo';
 import TextButton from './components/TextButton';
 import ImageButton from './components/ImageButton';
-import { light, dark } from './theme';
 /* global chrome */
 
 class App extends Component {
     state = {
         notifications: true,
         dark: true,
-        items: [
-            {
-                itemName: '',
-                number: 0,
-                id: '0a73d808-3452-414b-ae45-a040a9be244c',
-            },
-        ],
+        items: [],
     };
 
     componentDidMount() {
@@ -30,14 +25,9 @@ class App extends Component {
             this.setState({ ...this.state, items: items });
         });
 
-        // if (!localStorage.getItem('notifications')) {
-        //     localStorage.setItem('notifications', true);
-        //     console.log('App.js notifications are set to true');
-        // }
-
         if (localStorage.getItem('notifications')) {
             const notifications = localStorage.getItem('notifications') === 'true' ? true : false;
-            //Q
+
             this.setState({
                 ...this.state,
                 notifications,
@@ -46,14 +36,21 @@ class App extends Component {
 
         if (localStorage.getItem('theme')) {
             const theme = localStorage.getItem('theme') === 'true' ? true : false;
-            //Q
+
             this.setState(prevState => ({
                 ...prevState.state,
                 dark: theme,
             }));
         }
-        //should I remove this listene - CWU?
-        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
+        //TODO
+        // setState({
+        //     dark: localStorage.getItem('theme') && localStorage.getItem('theme') === 'true',
+        //     notifications: localStorage.getItem('notifications') && localStorage.getItem('notifications') === 'true',
+        // });
+
+        //should I remove this listener - CWU
+        chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
             if (increaseCommands.includes(message)) {
                 const index = message.substr(0, 1);
                 sendResponse('increased');
@@ -68,7 +65,7 @@ class App extends Component {
         });
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(_, prevState) {
         if (prevState.items !== this.state.items) {
             storageSync(this.state.items);
         }
@@ -121,6 +118,8 @@ class App extends Component {
     onChangeHandler = (e, index, type) => {
         const updatedState = this.getState();
         updatedState.items[index][type] = type === 'number' ? +e.target.value : e.target.value;
+        //TODO
+        debounce(console.log('peeeeep'), 200);
         this.setState(updatedState);
     };
 
@@ -148,7 +147,7 @@ class App extends Component {
     };
 
     exportHandler = () => {
-        let arrOfValues = this.state.items.map(a => a.itemName + ',' + a.number);
+        let arrOfValues = this.state.items.map(item => item.itemName + ',' + item.number);
         arrOfValues.unshift('Item name,Number');
         const csv = arrOfValues.join('\n');
         const data = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' });
@@ -157,6 +156,7 @@ class App extends Component {
     };
 
     render() {
+        //TODO - nedělat - je to prasečina - header se tvoří po každém updatu (volá se render)
         const Header = styled.h1`
             display: inline;
             font-size: 1.3rem;
