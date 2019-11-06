@@ -15,8 +15,6 @@ export default styled.button`
     height: ${props => (props.small ? '23px' : 'initial')};
     background: ${props => props.theme.backgroundColor};
     color: ${props => props.theme.primaryColor};
-    /* margin-left: ${props => (props.left ? '1rem' : 'inherit')};
-    margin-right: ${props => (props.right ? '1rem' : 'inherit')}; */
     outline: none;
     overflow: hidden;
     border: none;
