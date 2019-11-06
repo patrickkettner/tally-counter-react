@@ -1,10 +1,13 @@
-import styled from 'styled-components';
 import React from 'react';
+import PropTypes from 'prop-types';
 
+import styled from 'styled-components';
+
+export const types = { DELETE: 'delete' };
 
 const changeButtonBackground = props => {
     switch (props.type) {
-        case 'delete':
+        case types.DELETE:
             return '#ff5d5d';
 
         case 'plus':
@@ -21,9 +24,9 @@ const changeButtonBackground = props => {
     }
 };
 
-const Button = ({className, ...props}) => {
+const Button = ({ className, ...props }) => {
     return (
-        <button className={className} onClick={props.delete}>
+        <button className={className} onClick={props.onClick}>
             <i className={props.type === 'delete' ? 'fas fa-times' : `fas fa-${props.type}`} />
         </button>
     );
@@ -49,5 +52,9 @@ const ActionButton = styled(Button)`
         ${props => (props.type === 'undo' ? 'transform: rotate(-180deg) scale(1.2)' : 'transform: scale(1.2)')};
     }
 `;
+
+ActionButton.propTypes = {
+    type: PropTypes.oneOf([types.DELETE, 'plus', 'minus', 'undo']).isRequired,
+};
 
 export default ActionButton;

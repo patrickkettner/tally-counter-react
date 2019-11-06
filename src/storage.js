@@ -1,5 +1,6 @@
-// gets data from chrome storage in the form of a promise
+import uuid from 'uuid/v4';
 
+/* global chrome */
 export const getData = () => {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get(['items'], function(result) {
@@ -7,20 +8,18 @@ export const getData = () => {
                 console.error(chrome.runtime.lastError.message);
                 reject(chrome.runtime.lastError.message);
             } else {
-                // let res = result.items ?
-                //     result.items :
-                //     [{ itemName: '', number: 0 }];
+                let res = result.items ? result.items : [{ itemName: '', number: 0, id: uuid() }];
 
-                let res = result.items;
+                res = res.length ? res : [{ itemName: '', number: 0, id: uuid() }];
 
-                // res = res.length ? res : [{ itemName: '', number: 0 }];
-
-                // storageSync(res);
+                storageSync(res);
                 resolve(res);
             }
         });
     });
 };
+
+// export const data = async () => await getData();
 
 //syncs items array with chrome.storage
 export const storageSync = items =>

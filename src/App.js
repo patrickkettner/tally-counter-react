@@ -1,43 +1,89 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
+import uuid from 'uuid/v4';
+import { getData, storageSync } from './storage';
 
+import Container from './components/Container';
 import Item from './components/Item';
 import Logo from './components/Logo';
-import Button from './components/Button';
+import TextButton from './components/TextButton';
+import ImageButton from './components/ImageButton';
+import { light, dark } from './theme';
 
 class App extends Component {
     state = {
+        notifications: true,
+        dark: false,
         items: [
             {
-                itemName: 'whatever',
-                number: 2,
+                itemName: '',
+                number: 0,
+                id: '0a73d808-3452-414b-ae45-a040a9be244c',
             },
             {
-                itemName: 'něco',
-                number: -1,
+                itemName: 'error',
+                number: 999,
+                id: '2060229c-dd26-4f6b-a253-f8e2e9f029f0',
             },
         ],
     };
 
-    // componentDidUpdate(prevProps, prevState) {
-    //     console.log(prevState.items);
-    //     console.log(this.state.items);
-    // }
+    // data = async () => {
+    //     const items = await getData;
+    //     await this.setState({ ...this.state, items: items });
+    // };
+
+    componentDidMount() {
+        getData().then(items => {
+            this.setState({ ...this.state, items: items });
+        });
+        if (localStorage.getItem('theme')) {
+            const theme = localStorage.getItem('theme') === 'true' ? true : false;
+            this.setState(prevState => ({
+                dark: theme,
+            }));
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.items !== this.state.items) {
+            storageSync(this.state.items);
+        }
+        console.log(this.state.notifications);
+        // console.log(this.state.dark);
+        console.log(this.state.items);
+    }
 
     getState = () => {
         const updatedState = {
             ...this.state,
-            items: JSON.parse(JSON.stringify(this.state.items))
-        }
+            items: [...this.state.items],
+        };
         return updatedState;
-    }
+    };
+
+    toggleNotificationsHandler = () => {
+        const notifications = !this.state.notifications;
+        localStorage.setItem('notifications', notifications);
+        this.setState(prevState => ({
+            notifications: !prevState.notifications,
+        }));
+    };
+
+    toggleThemeHandler = () => {
+        const theme = !this.state.dark;
+        localStorage.setItem('theme', theme);
+        this.setState(prevState => ({
+            dark: !prevState.dark,
+        }));
+    };
 
     addItemHandler = () => {
         const updatedState = this.getState();
-        updatedState.items.push({ itemName: '', number: 0 });
+        updatedState.items.push({ itemName: '', number: 0, id: uuid() });
 
         this.setState(updatedState);
-    }
+    };
 
     resetAllHandler = () => {
         const updatedArray = this.state.items.map(item => {
@@ -45,39 +91,51 @@ class App extends Component {
             return item;
         });
         this.setState({ items: updatedArray });
-    }
+    };
 
     onChangeHandler = (e, index, type) => {
         const updatedState = this.getState();
         updatedState.items[index][type] = type === 'number' ? +e.target.value : e.target.value;
         this.setState(updatedState);
-    }
+    };
 
-    deleteHandler = (id) => {
-        // what is better?
-        // const updatedArray = [...this.state.items];
-        // updatedArray.splice(index, 1); - filter is better, because splice mutates the orginal array
-        const updatedArray = this.state.items.filter((_, index) => index !== id)
-        this.setState({ items: updatedArray })
-    }
+    deleteHandler = id => {
+        const updatedArray = this.state.items.filter((_, index) => index !== id);
+        this.setState({ items: updatedArray });
+    };
 
-    incrementHandler = (index) => {
+    incrementHandler = index => {
         const updatedState = this.getState();
+        console.log(updatedState);
+        const id = uuid();
+        const id2 = uuid();
+        console.log(id, id2);
         updatedState.items[index].number++;
         this.setState(updatedState);
-    }
+    };
 
-    decrementHandler = (index) => {
+    decrementHandler = index => {
         const updatedState = this.getState();
         updatedState.items[index].number--;
         this.setState(updatedState);
-    }
+    };
 
-    resetHandler = (index) => {
+    resetHandler = index => {
         const updatedState = this.getState();
         updatedState.items[index].number = 0;
         this.setState(updatedState);
-    }
+    };
+
+    exportHandler = () => {
+        let arrOfValues = this.state.items.map(a => a.itemName + ',' + a.number);
+        arrOfValues.unshift('Item name,Number');
+        let csv = arrOfValues.join('\n');
+
+        var data = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' });
+
+        var url = window.URL.createObjectURL(data);
+        document.getElementById('export').href = url;
+    };
 
     render() {
         const Header = styled.h1`
@@ -85,53 +143,53 @@ class App extends Component {
             font-size: 1.3rem;
             font-weight: lighter;
         `;
-
         return (
-            <div className="App">
-                <Header>Tally Counter</Header>
-                <img
-                    src="images/icon48.png"
-                    id="icon"
-                    alt="logo"
-                    style={{
-                        width: 18,
-                        display: 'inline',
-                        marginLeft: '0.3rem',
-                    }}
-                />
-                <Logo />
+            <ThemeProvider theme={this.state.dark ? dark : light}>
+                <Container>
+                    <ImageButton
+                        left
+                        small
+                        className={this.state.notifications ? 'fas fa-bell-slash' : 'fas fa-bell'}
+                        style={{ width: '20px' }}
+                        onClick={this.toggleNotificationsHandler}
+                    />
+                    <Header>Tally Counter</Header>
+                    <Logo />
+                    <ImageButton
+                        small
+                        right
+                        className={this.state.dark ? 'fa fa-lightbulb' : 'fas fa-moon'}
+                        style={{ width: '22.4px' }}
+                        onClick={this.toggleThemeHandler}
+                    />
+                    <div style={{ margin: '1rem 0' }}>
+                        <TextButton float="left" onClick={this.addItemHandler}>
+                            Add item
+                        </TextButton>
 
-                settings, export btn
-                <br />
-                <div>
-                    <Button
-                        float="left"
-                        onClick={this.addItemHandler}>
-                        Add item
-                    </Button>
-                    <Button
-                        type="danger"
-                        float="right"
-                        onClick={this.resetAllHandler}>
-                        Reset all
-                    </Button>
-                </div>
+                        <a id="export" href="index.html" download="tally-counter.csv">
+                            <ImageButton className="fas fa-file-download" onClick={this.exportHandler} />
+                        </a>
 
-                {
-                    this.state.items.map((item, index) => (
+                        <TextButton type="danger" float="right" onClick={this.resetAllHandler}>
+                            Reset all
+                        </TextButton>
+                    </div>
+                    {this.state.items.map((item, index) => (
                         <Item
                             numberValue={item.number}
                             itemName={item.itemName}
-                            key={index}
-                            itemNameChange={(e) => this.onChangeHandler(e, index, 'itemName')}
-                            numberChange={(e) => this.onChangeHandler(e, index, 'number')}
+                            key={item.id} //is this alright? I heard you shouldn't use index as a key - yeah it's wrong David!!
+                            itemNameChange={e => this.onChangeHandler(e, index, 'itemName')}
+                            numberChange={e => this.onChangeHandler(e, index, 'number')}
                             delete={() => this.deleteHandler(index)}
                             increment={() => this.incrementHandler(index)}
                             decrement={() => this.decrementHandler(index)}
-                            reset={() => this.resetHandler(index)} />
-                    ))
-                }
-            </div >
+                            reset={() => this.resetHandler(index)}
+                        />
+                    ))}
+                </Container>
+            </ThemeProvider>
         );
     }
 }
