@@ -9,7 +9,7 @@ const TextButton = styled.button`
     outline: none;
     border: none;
     cursor: pointer;
-    background: ${props => (props.type === 'danger' ? '#FF3232' : props.theme.primaryColor)};
+    background: ${props => (props.type === 'danger' ? props.theme.resetButton : props.theme.primaryColor)};
     float: ${props => props.float};
 
     &: hover {

@@ -25,6 +25,7 @@ chrome.runtime.onInstalled.addListener(function(details) {
     }
 });
 
+//TODO
 //onUpdateAvailable notification
 chrome.runtime.onUpdateAvailable.addListener(() => {
     const options = {
@@ -66,11 +67,19 @@ async function handleCommand(command, index) {
             items[index].number -= 1;
         }
         storageSync(items);
+        chrome.browserAction.setBadgeText({ text: `${items[index].number}` });
+        setTimeout(function() {
+            chrome.browserAction.setBadgeText({ text: '' });
+        }, 2000);
         const notificationSettings = JSON.parse(localStorage.getItem('notifications'));
         if (notificationSettings) {
             notification(items[index].itemName, items[index].number, index);
         }
     } catch (error) {
+        chrome.browserAction.setBadgeText({ text: 'err' });
+        setTimeout(function() {
+            chrome.browserAction.setBadgeText({ text: '' });
+        }, 2000);
         if (error.message == "Cannot read property 'number' of undefined") {
             errNotification(index);
         }

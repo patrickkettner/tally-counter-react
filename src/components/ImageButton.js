@@ -19,6 +19,7 @@ export default styled.button`
     overflow: hidden;
     border: none;
     float: ${changeFloat};
+
     &:hover {
         cursor: pointer;
         color: ${props => props.theme.btnBackgroundHover};

@@ -8,13 +8,13 @@
     "background": {
         "page": "background.html"
     },
-    "page_action": {
-        "default_popup": "index.html",
+    "browser_action": {
         "default_icon": {
             "16": "images/icon16.png",
             "48": "images/icon48.png",
             "128": "images/icon48.png"
-        }
+        },
+        "default_popup": "index.html"
     },
     "icons": {
         "16": "images/icon16.png",
@@ -60,10 +60,10 @@
         "4zdec": {
             "description": "Fifth item -1"
         },
-        "_execute_page_action": {
+        "_execute_browser_action": {
             "suggested_key": {
-                "default": "Alt+T",
-                "mac": "MacCtrl+T"
+                "default": "Alt+D",
+                "mac": "MacCtrl+D"
             }
         }
     }

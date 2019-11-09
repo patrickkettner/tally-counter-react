@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import uuid from 'uuid/v4';
 import debounce from 'lodash.debounce';
+
 import { getData, storageSync } from './storage';
 import { increaseCommands, decreaseCommands } from './commands.js';
 
@@ -11,6 +12,14 @@ import Item from './components/Item';
 import Logo from './components/Logo';
 import TextButton from './components/TextButton';
 import ImageButton from './components/ImageButton';
+
+const Header = styled.h1`
+    display: inline;
+    font-size: 1.3rem;
+    font-weight: lighter;
+    transition: color 0.1s;
+`;
+
 /* global chrome */
 
 class App extends Component {
@@ -20,36 +29,21 @@ class App extends Component {
         items: [],
     };
 
+    // constructor(props) {
+    //     super(props);
+    //     this.debouncedUpdateStore = debounce(this.updateStorage.bind(this), 300);
+    // }
+
     componentDidMount() {
         getData().then(items => {
             this.setState({ ...this.state, items: items });
         });
 
-        if (localStorage.getItem('notifications')) {
-            const notifications = localStorage.getItem('notifications') === 'true' ? true : false;
+        this.setState({
+            dark: localStorage.getItem('darkTheme') && localStorage.getItem('darkTheme') === 'true',
+            notifications: localStorage.getItem('notifications') && localStorage.getItem('notifications') === 'true',
+        });
 
-            this.setState({
-                ...this.state,
-                notifications,
-            });
-        }
-
-        if (localStorage.getItem('theme')) {
-            const theme = localStorage.getItem('theme') === 'true' ? true : false;
-
-            this.setState(prevState => ({
-                ...prevState.state,
-                dark: theme,
-            }));
-        }
-
-        //TODO
-        // setState({
-        //     dark: localStorage.getItem('theme') && localStorage.getItem('theme') === 'true',
-        //     notifications: localStorage.getItem('notifications') && localStorage.getItem('notifications') === 'true',
-        // });
-
-        //should I remove this listener - CWU
         chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
             if (increaseCommands.includes(message)) {
                 const index = message.substr(0, 1);
@@ -67,9 +61,14 @@ class App extends Component {
 
     componentDidUpdate(_, prevState) {
         if (prevState.items !== this.state.items) {
-            storageSync(this.state.items);
+            this.debounced();
+            // this.debouncedUpdateStore(); //with constructor
         }
     }
+
+    debounced = debounce(() => storageSync(this.state.items), 300); //without constructor
+
+    // debounced = debounce(this.updateStorage, 300); //with constructor
 
     getState = () => {
         const updatedState = {
@@ -89,7 +88,7 @@ class App extends Component {
 
     toggleThemeHandler = () => {
         const theme = !this.state.dark;
-        localStorage.setItem('theme', theme);
+        localStorage.setItem('darkTheme', theme);
         this.setState(prevState => ({
             dark: !prevState.dark,
         }));
@@ -118,8 +117,6 @@ class App extends Component {
     onChangeHandler = (e, index, type) => {
         const updatedState = this.getState();
         updatedState.items[index][type] = type === 'number' ? +e.target.value : e.target.value;
-        //TODO
-        debounce(console.log('peeeeep'), 200);
         this.setState(updatedState);
     };
 
@@ -156,13 +153,6 @@ class App extends Component {
     };
 
     render() {
-        //TODO - nedělat - je to prasečina - header se tvoří po každém updatu (volá se render)
-        const Header = styled.h1`
-            display: inline;
-            font-size: 1.3rem;
-            font-weight: lighter;
-            transition: color 0.1s;
-        `;
         return (
             <ThemeProvider theme={this.state.dark ? dark : light}>
                 <Container>
@@ -172,6 +162,7 @@ class App extends Component {
                         className={this.state.notifications ? 'fas fa-bell-slash' : 'fas fa-bell'}
                         style={{ width: '20px' }}
                         onClick={this.toggleNotificationsHandler}
+                        title="Toggle hotkey notifications"
                     />
                     <Header>Tally Counter</Header>
                     <Logo />
@@ -181,6 +172,7 @@ class App extends Component {
                         className={this.state.dark ? 'fa fa-lightbulb' : 'fas fa-moon'}
                         style={{ width: '22.4px' }}
                         onClick={this.toggleThemeHandler}
+                        title="Toggle night mode"
                     />
                     <div style={{ margin: '1rem 0' }}>
                         <TextButton float="left" onClick={this.addItemHandler}>
@@ -188,7 +180,11 @@ class App extends Component {
                         </TextButton>
 
                         <a id="export" href="index.html" download="tally-counter.csv">
-                            <ImageButton className="fas fa-file-download" onClick={this.exportHandler} />
+                            <ImageButton
+                                className="fas fa-file-download"
+                                onClick={this.exportHandler}
+                                title="Export to .csv"
+                            />
                         </a>
 
                         <TextButton type="danger" float="right" onClick={this.resetAllHandler}>
