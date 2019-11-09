@@ -11,13 +11,15 @@ const changeFloat = props => {
 };
 
 export default styled.button`
-    font-size: ${props => (props.small ? '1rem' : '1.4rem')};
+    font-size: ${props => (props.small ? '0.9rem' : '1.4rem')};
+    height: ${props => (props.small ? '23px' : 'initial')};
     background: ${props => props.theme.backgroundColor};
     color: ${props => props.theme.primaryColor};
     outline: none;
     overflow: hidden;
     border: none;
     float: ${changeFloat};
+
     &:hover {
         cursor: pointer;
         color: ${props => props.theme.btnBackgroundHover};

@@ -3,21 +3,21 @@ import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 
-export const types = { DELETE: 'delete' };
+export const types = { DELETE: 'delete', PLUS: 'plus', MINUS: 'minus', UNDO: 'undo' };
 
 const changeButtonBackground = props => {
     switch (props.type) {
         case types.DELETE:
             return '#ff5d5d';
 
-        case 'plus':
-            return '#64ff50';
+        case types.PLUS:
+            return props.theme.plusButton;
 
-        case 'minus':
+        case types.MINUS:
             return '#ff5d5d';
 
-        case 'undo':
-            return '#ffee00';
+        case types.UNDO:
+            return props.theme.undoButton;
 
         default:
             return '#333';
@@ -33,28 +33,24 @@ const Button = ({ className, ...props }) => {
 };
 
 const ActionButton = styled(Button)`
-    width: 1.5rem;
+    min-width: 1.5rem;
     height: 1.5rem;
-    padding: 0 0.5rem;
     margin: 0.2rem;
+    font-size: 1rem;
     color: #fff;
     border-radius: 50%;
-    font-size: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     outline: none;
     border: none;
+    transition: transform 0.2s;
     cursor: pointer;
     background: ${changeButtonBackground};
-    transition: transform 0.3s;
     &:hover {
         ${props => (props.type === 'undo' ? 'transform: rotate(-180deg) scale(1.2)' : 'transform: scale(1.2)')};
     }
 `;
 
 ActionButton.propTypes = {
-    type: PropTypes.oneOf([types.DELETE, 'plus', 'minus', 'undo']).isRequired,
+    type: PropTypes.oneOf([types.DELETE, types.PLUS, types.MINUS, types.UNDO]).isRequired,
 };
 
 export default ActionButton;

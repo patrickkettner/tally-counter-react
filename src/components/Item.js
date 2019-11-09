@@ -25,6 +25,9 @@ const Item = styled(baseItem)`
     justify-content: center;
     margin: 0.5rem 0;
     background: ${props => props.theme.backgroundColor};
+    &:last-of-type {
+        margin-bottom: 1rem;
+    }
 `;
 
 //is there a difference between Item.propTypes and baseItem.propTypes?

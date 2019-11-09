@@ -7,11 +7,9 @@ export const getData = () => {
                 console.error(chrome.runtime.lastError.message);
                 reject(chrome.runtime.lastError.message);
             } else {
-                // let res = result.items ?
-                //     result.items :
-                //     [{ itemName: '', number: 0 }];
+                let res = result.items ? result.items : [{ itemName: '', number: 0 }];
 
-                let res = result.items;
+                // let res = result.items;
 
                 // res = res.length ? res : [{ itemName: '', number: 0 }];
 

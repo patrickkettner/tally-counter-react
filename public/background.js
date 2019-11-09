@@ -1,8 +1,6 @@
 import { getData, storageSync } from './storage.js';
 import { increaseCommands, decreaseCommands } from './commands.js';
 
-let items;
-
 // onInstalled
 chrome.runtime.onInstalled.addListener(function(details) {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
@@ -13,31 +11,33 @@ chrome.runtime.onInstalled.addListener(function(details) {
             },
         ]);
     });
-    // if (details.reason == 'install') {
-    //     chrome.tabs.create({ url: chrome.extension.getURL('welcome.html') }, function() {});
-    // }
-    // if (details.reason == 'update') {
-    //     chrome.tabs.create({ url: chrome.extension.getURL('update.html') }, function() {});
-    // }
+    if (details.reason == 'install') {
+        chrome.tabs.create({ url: chrome.extension.getURL('welcome.html') }, function() {});
+        localStorage.setItem('notifications', true);
+        console.log('INSTALL notifications are set to true');
+    }
+    if (details.reason == 'update') {
+        chrome.tabs.create({ url: chrome.extension.getURL('update.html') }, function() {});
+        if (!localStorage.getItem('notifications')) {
+            localStorage.setItem('notifications', true);
+            console.log('UPDATE notifications are set to true');
+        }
+    }
 });
 
-// changes numbers in the item array from strings to numbers for people updating from older versions - will remove later
-const init = async () => {
-    //gets item array from storage and assigns it to items variable
-    items = await getData();
-    items.forEach(item => {
-        if (typeof item.number == 'string') {
-            item.number = parseInt(item.number);
-        }
-    });
-    console.log('Ive got the data man!');
-    // storageSync(items);
-};
-
-init();
+//TODO
+//onUpdateAvailable notification
+chrome.runtime.onUpdateAvailable.addListener(() => {
+    const options = {
+        type: 'basic',
+        title: 'Tally counter',
+        message: 'Tally counter update available, restart chrome!',
+        iconUrl: 'images/icon128.png',
+    };
+    chrome.notifications.create(options);
+});
 
 const notification = (itemName, number, index) => {
-    console.log(itemName, number, index);
     const name = !itemName ? `(item #${index + 1})` : itemName;
     const options = {
         type: 'basic',
@@ -58,36 +58,41 @@ const errNotification = index => {
     chrome.notifications.create(options);
 };
 
-//Tome, je ok, že je tahle funkce takhle dlouhá? Mám nějakou část vyhodit ven a zavolat ji?
+async function handleCommand(command, index) {
+    const items = await getData();
+    try {
+        if (increaseCommands.includes(command)) {
+            items[index].number += 1;
+        } else {
+            items[index].number -= 1;
+        }
+        storageSync(items);
+        chrome.browserAction.setBadgeText({ text: `${items[index].number}` });
+        setTimeout(function() {
+            chrome.browserAction.setBadgeText({ text: '' });
+        }, 2000);
+        const notificationSettings = JSON.parse(localStorage.getItem('notifications'));
+        if (notificationSettings) {
+            notification(items[index].itemName, items[index].number, index);
+        }
+    } catch (error) {
+        chrome.browserAction.setBadgeText({ text: 'err' });
+        setTimeout(function() {
+            chrome.browserAction.setBadgeText({ text: '' });
+        }, 2000);
+        if (error.message == "Cannot read property 'number' of undefined") {
+            errNotification(index);
+        }
+    }
+}
 
 chrome.commands.onCommand.addListener(function(command) {
     if (increaseCommands.includes(command) || decreaseCommands.includes(command)) {
         chrome.runtime.sendMessage(command, () => {
-            // popup.js doesn't receive message - chrome throws an error - background.js handles the hotkey command
+            // App.js doesn't receive message - chrome throws an error - background.js handles the hotkey command
             if (chrome.runtime.lastError) {
                 const index = +command.substr(0, 1);
-
-                async function handleCommand() {
-                    items = await getData();
-                    try {
-                        if (increaseCommands.includes(command)) {
-                            items[index].number += 1;
-                        } else {
-                            items[index].number -= 1;
-                        }
-                        storageSync(items);
-                        const notificationSettings = JSON.parse(localStorage.getItem('notifications'));
-                        if (notificationSettings) {
-                            console.log(notificationSettings);
-                            notification(items[index].itemName, items[index].number, index);
-                        }
-                    } catch (error) {
-                        if (error.message == "Cannot read property 'number' of undefined") {
-                            errNotification(index);
-                        }
-                    }
-                }
-                handleCommand();
+                handleCommand(command, index);
             }
         });
     }
