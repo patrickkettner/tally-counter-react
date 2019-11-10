@@ -12,7 +12,7 @@ const TextButton = styled.button`
     background: ${props => (props.type === 'danger' ? props.theme.resetButton : props.theme.primaryColor)};
     float: ${props => props.float};
 
-    &: hover {
+    &:hover {
         background: ${props => (props.type === 'danger' ? '#ff7878' : props.theme.btnBackgroundHover)};
     }
 `;

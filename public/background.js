@@ -1,3 +1,4 @@
+import debounce from './modules/lodash.debounce/index.js';
 import { getData, storageSync } from './storage.js';
 import { increaseCommands, decreaseCommands } from './commands.js';
 
@@ -14,27 +15,19 @@ chrome.runtime.onInstalled.addListener(function(details) {
     if (details.reason == 'install') {
         chrome.tabs.create({ url: chrome.extension.getURL('welcome.html') }, function() {});
         localStorage.setItem('notifications', true);
-        console.log('INSTALL notifications are set to true');
     }
     if (details.reason == 'update') {
         chrome.tabs.create({ url: chrome.extension.getURL('update.html') }, function() {});
         if (!localStorage.getItem('notifications')) {
             localStorage.setItem('notifications', true);
-            console.log('UPDATE notifications are set to true');
         }
     }
 });
 
-//TODO
 //onUpdateAvailable notification
 chrome.runtime.onUpdateAvailable.addListener(() => {
-    const options = {
-        type: 'basic',
-        title: 'Tally counter',
-        message: 'Tally counter update available, restart chrome!',
-        iconUrl: 'images/icon128.png',
-    };
-    chrome.notifications.create(options);
+    createBadge('↻');
+    chrome.browserAction.setTitle({ title: 'Update available, please restart chrome' });
 });
 
 const notification = (itemName, number, index) => {
@@ -58,6 +51,33 @@ const errNotification = index => {
     chrome.notifications.create(options);
 };
 
+const createBadge = (text, index) => {
+    const badgeColor = index => {
+        switch (index) {
+            case 1:
+                return '#29a470';
+
+            case 2:
+                return '#cc338c';
+
+            case 3:
+                return '#de9900';
+
+            case 4:
+                return '#000';
+
+            case 'err':
+                return '#f00';
+
+            default:
+                return '#1f7fe0';
+        }
+    };
+    chrome.browserAction.setBadgeBackgroundColor({ color: badgeColor(index) });
+    chrome.browserAction.setBadgeText({ text });
+};
+const debounceClearBadge = debounce(() => createBadge(''), 700);
+
 async function handleCommand(command, index) {
     const items = await getData();
     try {
@@ -67,19 +87,18 @@ async function handleCommand(command, index) {
             items[index].number -= 1;
         }
         storageSync(items);
-        chrome.browserAction.setBadgeText({ text: `${items[index].number}` });
-        setTimeout(function() {
-            chrome.browserAction.setBadgeText({ text: '' });
-        }, 2000);
+
+        createBadge(`${items[index].number}`, index);
+        debounceClearBadge();
+
         const notificationSettings = JSON.parse(localStorage.getItem('notifications'));
         if (notificationSettings) {
             notification(items[index].itemName, items[index].number, index);
         }
     } catch (error) {
-        chrome.browserAction.setBadgeText({ text: 'err' });
-        setTimeout(function() {
-            chrome.browserAction.setBadgeText({ text: '' });
-        }, 2000);
+        createBadge('err', 'err');
+        debounceClearBadge();
+
         if (error.message == "Cannot read property 'number' of undefined") {
             errNotification(index);
         }

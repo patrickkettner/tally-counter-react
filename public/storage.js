@@ -23,5 +23,5 @@ export const getData = () => {
 //syncs items array with chrome.storage
 export const storageSync = items =>
     chrome.storage.sync.set({ items }, function() {
-        console.log('storage synced');
+        console.log('storage synced', items);
     });

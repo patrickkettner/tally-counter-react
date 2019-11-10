@@ -13,6 +13,11 @@ export const getData = () => {
 
                 res = res.length ? res : [{ itemName: '', number: 0, id: uuid() }];
 
+                //for users updating from older version before uuid was implemented
+                res.forEach(item => {
+                    item.id = item.id ? item.id : uuid();
+                });
+
                 storageSync(res);
                 resolve(res);
             }

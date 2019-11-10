@@ -61,12 +61,12 @@ class App extends Component {
 
     componentDidUpdate(_, prevState) {
         if (prevState.items !== this.state.items) {
-            this.debounced();
+            this.debouncedStorageSync();
             // this.debouncedUpdateStore(); //with constructor
         }
     }
 
-    debounced = debounce(() => storageSync(this.state.items), 300); //without constructor
+    debouncedStorageSync = debounce(() => storageSync(this.state.items), 200); //without constructor
 
     // debounced = debounce(this.updateStorage, 300); //with constructor
 
