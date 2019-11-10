@@ -14,16 +14,18 @@ body {
     background: var(--light-color);
     margin: 0 auto;
     text-align: center;
-    padding: 1rem;
+    padding: 2rem;
     font-size: 1rem;
-    padding-bottom: 0.5rem;
+    line-height: 1.6rem;
     font-family: 'Open Sans', Arial, sans-serif;
     /* font-family: Arial, Helvetica, sans-serif; */
     color: #333;
     font-weight: 400;
 }
 
-h1, h2, h3, h4 {
+h1,
+h3,
+h4 {
     padding: 1rem;
 }
 
@@ -35,6 +37,8 @@ h1 {
 
 h2 {
     color: rgb(49, 34, 255);
+    padding: 1.5rem 0;
+    margin-top: 1.5rem;
 }
 
 a,
@@ -47,9 +51,27 @@ a:hover {
     color: purple;
 }
 
-.lead{
+.lead {
     font-size: 2rem;
     font-weight: 200;
+}
+
+.py {
+    padding: 1rem 0;
+}
+
+.image {
+    padding-top: 2rem;
+}
+
+.circle {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-block;
+    border-radius: 30%;
+    background: black;
+    vertical-align: sub;
+    margin: 0 0.3rem 0 1rem;
 }
 
 .hotkey {
@@ -71,11 +93,12 @@ a:hover {
     margin-left: 1.5rem;
 }
 
-.hotkey .windows, .mac {
+.hotkey .windows,
+.mac {
     width: 125px;
     border-radius: 100px;
     padding: 0.5rem;
-    background:	rgb(49, 34, 255);
+    background: rgb(49, 34, 255);
     color: #fff;
     font-weight: bold;
 }
@@ -96,7 +119,7 @@ a:hover {
 }
 
 .danger {
-    color:red;
+    color: red;
 }
 
 #welcome h1 strong {
@@ -109,7 +132,7 @@ a:hover {
 }
 
 #hotkeys {
-padding-top: 0.5rem;
+    padding-top: 0.5rem;
 }
 
 #hotkeys div:first-of-type {
@@ -120,7 +143,13 @@ padding-top: 0.5rem;
     margin-bottom: 2rem;
 }
 
-
 #export {
     padding-top: 2rem;
+}
+
+#circles {
+    margin: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
