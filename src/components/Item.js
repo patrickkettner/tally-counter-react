@@ -30,8 +30,6 @@ const Item = styled(baseItem)`
     }
 `;
 
-//is there a difference between Item.propTypes and baseItem.propTypes?
-
 Item.propTypes = {
     numberValue: PropTypes.number.isRequired,
     itemName: PropTypes.string.isRequired,
