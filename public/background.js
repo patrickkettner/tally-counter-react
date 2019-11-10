@@ -2,7 +2,6 @@ import debounce from './modules/lodash.debounce/index.js';
 import { getData, storageSync } from './storage.js';
 import { increaseCommands, decreaseCommands } from './commands.js';
 
-// onInstalled
 chrome.runtime.onInstalled.addListener(function(details) {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
         chrome.declarativeContent.onPageChanged.addRules([
@@ -24,7 +23,6 @@ chrome.runtime.onInstalled.addListener(function(details) {
     }
 });
 
-//onUpdateAvailable notification
 chrome.runtime.onUpdateAvailable.addListener(() => {
     createBadge('↻');
     chrome.browserAction.setTitle({ title: 'Update available, please restart chrome' });
@@ -108,7 +106,6 @@ async function handleCommand(command, index) {
 chrome.commands.onCommand.addListener(function(command) {
     if (increaseCommands.includes(command) || decreaseCommands.includes(command)) {
         chrome.runtime.sendMessage(command, () => {
-            // App.js doesn't receive message - chrome throws an error - background.js handles the hotkey command
             if (chrome.runtime.lastError) {
                 const index = +command.substr(0, 1);
                 handleCommand(command, index);
