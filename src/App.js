@@ -8,17 +8,11 @@ import { increaseCommands, decreaseCommands } from './commands.js';
 
 import { light, dark } from './theme';
 import Container from './components/Container';
+import Header from './components/Header';
+import ImageButton from './components/ImageButton';
 import Item from './components/Item';
 import Logo from './components/Logo';
 import TextButton from './components/TextButton';
-import ImageButton from './components/ImageButton';
-
-const Header = styled.h1`
-    display: inline;
-    font-size: 1.3rem;
-    font-weight: lighter;
-    transition: color 0.1s;
-`;
 
 /* global chrome */
 
