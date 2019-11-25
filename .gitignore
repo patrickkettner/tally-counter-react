@@ -9,6 +9,7 @@
 # production
 /build
 /marketing
+/images-old
 
 # misc
 .DS_Store
