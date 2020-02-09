@@ -1,4 +1,5 @@
-I needed a chrome extension such as this, couldn't find any, so I programmed it. :)
+I needed a chrome extension such as this, couldn't find any, so I programmed it. :)   
+
 Live version: https://chrome.google.com/webstore/detail/tally-counter/innllipkgdpgnnhmbhjfminingfjmlgl
 
 **************************************************
