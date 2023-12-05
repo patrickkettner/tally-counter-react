@@ -3,7 +3,7 @@ import { getData, storageSync } from './storage.js';
 import { increaseCommands, decreaseCommands } from './commands.js';
 
 // onInstalled
-chrome.runtime.onInstalled.addListener(function(details) {
+chrome.runtime.onInstalled.addListener(async function(details) {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
         chrome.declarativeContent.onPageChanged.addRules([
             {
@@ -13,13 +13,14 @@ chrome.runtime.onInstalled.addListener(function(details) {
         ]);
     });
     if (details.reason == 'install') {
-        chrome.tabs.create({ url: chrome.extension.getURL('welcome.html') }, function() {});
-        localStorage.setItem('notifications', true);
+        chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') }, function() {});
+        chrome.storage.local.set({'notifications': true});
     }
     if (details.reason == 'update') {
-        chrome.tabs.create({ url: chrome.extension.getURL('update.html') }, function() {});
-        if (!localStorage.getItem('notifications')) {
-            localStorage.setItem('notifications', true);
+        chrome.tabs.create({ url: chrome.runtime.getURL('update.html') }, function() {});
+        const hasNotifications = await chrome.storage.local.get(['notifications'])
+        if (!hasNotifications) {
+            chrome.storage.local.set({'notifications': true});
         }
     }
 });
@@ -27,7 +28,7 @@ chrome.runtime.onInstalled.addListener(function(details) {
 //onUpdateAvailable notification
 chrome.runtime.onUpdateAvailable.addListener(() => {
     createBadge('↻');
-    chrome.browserAction.setTitle({ title: 'Update available, please restart chrome' });
+    chrome.action.setTitle({ title: 'Update available, please restart chrome' });
 });
 
 const notification = (itemName, number, index) => {
@@ -73,8 +74,8 @@ const createBadge = (text, index) => {
                 return '#1f7fe0';
         }
     };
-    chrome.browserAction.setBadgeBackgroundColor({ color: badgeColor(index) });
-    chrome.browserAction.setBadgeText({ text });
+    chrome.action.setBadgeBackgroundColor({ color: badgeColor(index) });
+    chrome.action.setBadgeText({ text });
 };
 const debounceClearBadge = debounce(() => createBadge(''), 700);
 
@@ -90,8 +91,7 @@ async function handleCommand(command, index) {
 
         createBadge(`${items[index].number}`, index);
         debounceClearBadge();
-
-        const notificationSettings = JSON.parse(localStorage.getItem('notifications'));
+        const notificationSettings = await chrome.storage.local.get('notifications');
         if (notificationSettings) {
             notification(items[index].itemName, items[index].number, index);
         }
