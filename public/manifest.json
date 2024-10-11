@@ -1,6 +1,6 @@
 {
     "name": "Tally counter",
-    "version": "1.1.4",
+    "version": "1.2.2",
     "description": "Easy & intuitive tally counter for keeping track of anything you want.",
     "manifest_version": 3,
     "permissions": ["declarativeContent", "notifications", "storage"],

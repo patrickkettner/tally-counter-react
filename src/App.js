@@ -23,11 +23,6 @@ class App extends Component {
         items: [],
     };
 
-    // constructor(props) {
-    //     super(props);
-    //     this.debouncedUpdateStore = debounce(this.updateStorage.bind(this), 300);
-    // }
-
     componentDidMount() {
         getData().then(items => {
             this.setState({ ...this.state, items: items });
@@ -56,13 +51,10 @@ class App extends Component {
     componentDidUpdate(_, prevState) {
         if (prevState.items !== this.state.items) {
             this.debouncedStorageSync();
-            // this.debouncedUpdateStore(); //with constructor
         }
     }
 
-    debouncedStorageSync = debounce(() => storageSync(this.state.items), 200); //without constructor
-
-    // debounced = debounce(this.updateStorage, 300); //with constructor
+    debouncedStorageSync = debounce(() => storageSync(this.state.items), 200);
 
     getState = () => {
         const updatedState = {

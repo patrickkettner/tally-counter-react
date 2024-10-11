@@ -6,5 +6,4 @@ const Header = styled.h1`
     font-weight: lighter;
     transition: color 0.1s;
 `;
-
 export default Header;
