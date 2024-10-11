@@ -23,14 +23,15 @@ class App extends Component {
         items: [],
     };
 
-    componentDidMount() {
+    async componentDidMount() {
         getData().then(items => {
             this.setState({ ...this.state, items: items });
         });
 
         this.setState({
-            dark: localStorage.getItem('darkTheme') && localStorage.getItem('darkTheme') === 'true',
-            notifications: localStorage.getItem('notifications') && localStorage.getItem('notifications') === 'true',
+            dark: chrome.storage.sync.get(['darkTheme']) && chrome.storage.sync.get(['darkTheme']) === 'true',
+            notifications:
+                chrome.storage.sync.get(['notifications']) && chrome.storage.sync.get(['notifications']) === 'true',
         });
 
         chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
@@ -64,17 +65,17 @@ class App extends Component {
         return updatedState;
     };
 
-    toggleNotificationsHandler = () => {
+    toggleNotificationsHandler = async () => {
         const notifications = !this.state.notifications;
-        localStorage.setItem('notifications', notifications);
+        await chrome.storage.sync.set({ notifications: notifications });
         this.setState(prevState => ({
             notifications: !prevState.notifications,
         }));
     };
 
-    toggleThemeHandler = () => {
+    toggleThemeHandler = async () => {
         const theme = !this.state.dark;
-        localStorage.setItem('darkTheme', theme);
+        await chrome.storage.sync.set({ darkTheme: theme });
         this.setState(prevState => ({
             dark: !prevState.dark,
         }));

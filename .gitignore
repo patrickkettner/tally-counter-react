@@ -10,6 +10,8 @@
 /build
 /marketing
 /images-old
+build.crx
+build.pem
 
 # misc
 .DS_Store

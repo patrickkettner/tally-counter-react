@@ -2,9 +2,8 @@ import debounce from './modules/lodash.debounce/index.js';
 import { getData, storageSync } from './storage.js';
 import { increaseCommands, decreaseCommands } from './commands.js';
 
-chrome.runtime.onInstalled.addListener(async function(details) {
-
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+chrome.runtime.onInstalled.addListener(async function (details) {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
         chrome.declarativeContent.onPageChanged.addRules([
             {
                 conditions: [new chrome.declarativeContent.PageStateMatcher({})],
@@ -13,14 +12,22 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         ]);
     });
     if (details.reason == 'install') {
-        chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') }, function() {});
-        chrome.storage.local.set({'notifications': true});
+        chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') }, function () {});
+        chrome.storage.sync.set({ notifications: true });
     }
     if (details.reason == 'update') {
-        chrome.tabs.create({ url: chrome.runtime.getURL('update.html') }, function() {});
-        const hasNotifications = await chrome.storage.local.get(['notifications'])
+        chrome.tabs.create({ url: chrome.runtime.getURL('update.html') }, function () {});
+
+        const { dataMigrated } = await chrome.storage.sync.get('dataMigrated');
+
+        if (!dataMigrated) {
+            const items = { ...localStorage };
+            console.log('items');
+            await chrome.storage.sync.set({ ...items, dataMigrated: true });
+        }
+        const hasNotifications = await chrome.storage.sync.get(['notifications']);
         if (!hasNotifications) {
-            chrome.storage.local.set({'notifications': true});
+            chrome.storage.sync.set({ notifications: true });
         }
     }
 });
@@ -90,7 +97,7 @@ async function handleCommand(command, index) {
 
         createBadge(`${items[index].number}`, index);
         debounceClearBadge();
-        const notificationSettings = await chrome.storage.local.get('notifications');
+        const notificationSettings = await chrome.storage.sync.get('notifications');
         if (notificationSettings) {
             notification(items[index].itemName, items[index].number, index);
         }
@@ -104,7 +111,7 @@ async function handleCommand(command, index) {
     }
 }
 
-chrome.commands.onCommand.addListener(function(command) {
+chrome.commands.onCommand.addListener(function (command) {
     if (increaseCommands.includes(command) || decreaseCommands.includes(command)) {
         chrome.runtime.sendMessage(command, () => {
             if (chrome.runtime.lastError) {
