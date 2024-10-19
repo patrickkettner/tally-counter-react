@@ -13,21 +13,14 @@ chrome.runtime.onInstalled.addListener(async function (details) {
     });
     if (details.reason == 'install') {
         chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') }, function () {});
-        chrome.storage.sync.set({ notifications: true });
+        chrome.storage.local.set({ notifications: true });
     }
     if (details.reason == 'update') {
         chrome.tabs.create({ url: chrome.runtime.getURL('update.html') }, function () {});
 
-        const { dataMigrated } = await chrome.storage.sync.get('dataMigrated');
-
-        if (!dataMigrated) {
-            const items = { ...localStorage };
-            console.log('items');
-            await chrome.storage.sync.set({ ...items, dataMigrated: true });
-        }
-        const hasNotifications = await chrome.storage.sync.get(['notifications']);
-        if (!hasNotifications) {
-            chrome.storage.sync.set({ notifications: true });
+        const notificationsRes = await chrome.storage.local.get(['notifications']);
+        if (!notificationsRes.notifications) {
+            chrome.storage.local.set({ notifications: true });
         }
     }
 });
@@ -97,11 +90,12 @@ async function handleCommand(command, index) {
 
         createBadge(`${items[index].number}`, index);
         debounceClearBadge();
-        const notificationSettings = await chrome.storage.sync.get('notifications');
-        if (notificationSettings) {
+        const notificationSettings = await chrome.storage.local.get('notifications');
+        if (notificationSettings.notifications) {
             notification(items[index].itemName, items[index].number, index);
         }
     } catch (error) {
+        console.log('error', error);
         createBadge('err', 'err');
         debounceClearBadge();
 
